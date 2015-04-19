@@ -2,33 +2,26 @@ using UnityEngine;
 
 public class CarController : MonoBehaviour
 {
-	private bool _breaking;
+	private Engine _engine;
 	private float _gas;
-	private Rigidbody _rigidbody;
-	public Engine CarEngine;
-	public Steering SteeringSystem;
+	private Steering _steering;
 	public Transform SteeringWheel;
 
-	void Awake()
+	private void Awake()
 	{
-		_rigidbody = GetComponent<Rigidbody>();
+		_engine = GetComponent<Engine>();
+		_steering = GetComponent<Steering>();
 	}
 
-	public void SetBreaks(bool breaking)
+	public void SetMoveDirection(bool forward)
 	{
-		_breaking = breaking;
-		SetGas(_gas);
+		// We move forward as default
+		_engine.SetGas(forward ? -1 : 1);
 	}
 
 	public void SetSteer(float steer)
 	{
-		SteeringWheel.localEulerAngles = new Vector3(0, 0, steer*90);
-		SteeringSystem.SetSteering(steer);
-	}
-
-	public void SetGas(float gas)
-	{
-		_gas = _breaking ? -1 : Mathf.Clamp(gas, -1, 1);
-		CarEngine.SetGas(_gas);
+		SteeringWheel.localEulerAngles = new Vector3(0, steer*90, 0);
+		_steering.SetSteering(steer);
 	}
 }

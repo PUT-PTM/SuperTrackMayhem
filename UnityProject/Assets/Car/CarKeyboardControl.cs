@@ -20,9 +20,8 @@ namespace UnityStandardAssets.Vehicles.Car
 			_steer = Mathf.MoveTowards(_steer, h, SteerSpeed*Time.deltaTime);
 			_steer = Mathf.Clamp(_steer, -1, 1);
 			var adjustedSteer = Mathf.Sign(_steer)*_steer*_steer;
-			var v = Input.GetAxis("Vertical");
 			_car.SetSteer(adjustedSteer);
-			_car.SetGas(v);
+			_car.SetMoveDirection(Input.GetKey(KeyCode.Space));
 		}
 	}
 }

@@ -1,11 +1,20 @@
 ﻿using UnityEngine;
 
+[RequireComponent(typeof (Rigidbody))]
 public class Engine : MonoBehaviour
 {
 	private float _gas;
+	private Rigidbody _rigidbody;
+	private Transform _transform;
 	public float BreakingForce;
 	public float ForwardForce;
 	public WheelCollider[] RearWheels;
+
+	private void Awake()
+	{
+		_transform = GetComponent<Transform>();
+		_rigidbody = GetComponent<Rigidbody>();
+	}
 
 	public void SetGas(float gas)
 	{
@@ -14,9 +23,25 @@ public class Engine : MonoBehaviour
 
 	private void FixedUpdate()
 	{
-		foreach (var wheelCollider in RearWheels)
+		var dot = Vector3.Dot(_transform.forward*_gas, _rigidbody.velocity);
+		var breaking = dot < 0;
+
+		if (breaking)
 		{
-			wheelCollider.motorTorque = _gas > 0 ? ForwardForce*_gas : BreakingForce*_gas;
+			foreach (var wheelCollider in RearWheels)
+			{
+				wheelCollider.brakeTorque = BreakingForce;
+				wheelCollider.motorTorque = 0;
+			}
+		}
+		else
+		{
+			var motorTorque = _gas*ForwardForce;
+			foreach (var wheelCollider in RearWheels)
+			{
+				wheelCollider.motorTorque = motorTorque;
+				wheelCollider.brakeTorque = 0;
+			}
 		}
 	}
 }
