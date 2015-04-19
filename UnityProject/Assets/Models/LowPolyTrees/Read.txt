@@ -1,0 +1,2 @@
+Trees are in Ambient-Occlusion folder that is specially treated by Unity.
+See: http://docs.unity3d.com/432/Documentation/Components/terrain-Trees.html
