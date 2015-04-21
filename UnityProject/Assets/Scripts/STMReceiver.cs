@@ -1,20 +1,18 @@
 using UnityEngine;
 using System.IO.Ports;
 
+[RequireComponent(typeof(CarController))]
 public class STMReceiver : MonoBehaviour
 {
-	public STMRotator rotator;
-	// Wszystko poniżej można usunąć
-	
-	public static byte val;
-	public static int position;
+	private CarController _controller;
+	private byte val;
 	public SerialPort Port = new SerialPort("COM5", 112500, Parity.None, 8, StopBits.One);
 
 
 	void Start()
 	{
 		//SerialPort Port = new SerialPort("COM5", 115200, Parity.None, 8, StopBits.One);
-	
+		_controller = GetComponent<CarController>();
 		if (Port == null)
 			Debug.Log("Error, Port = Null");
 
@@ -35,9 +33,6 @@ public class STMReceiver : MonoBehaviour
 		}
 
 		Port.DataReceived += DataReceivedHandler;
-		position = 63;
-	//	Port.DtrEnable = true;
-	//	Port.RtsEnable = true;
 
 	}
 
@@ -53,8 +48,7 @@ public class STMReceiver : MonoBehaviour
 		/*if(((position-indata)<7)||((position-indata)>-7))
 			rotator.SetRotation ((byte)indata);*/
 
-		position = indata;
-		rotator.SetRotation ((byte)indata);
+		_controller.SetSteer(indata);
 
 	}
 
