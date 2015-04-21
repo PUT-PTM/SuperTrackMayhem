@@ -5,8 +5,8 @@ public class StartingLights : MonoBehaviour
 {
 	public float TimeBetweenLights;
 
-	public TurnOnLight YellowLight;
-	public TurnOnLight GreenLight;
+	public GameObject YellowLight;
+	public GameObject GreenLight;
 
 	private void Start()
 	{
@@ -16,9 +16,9 @@ public class StartingLights : MonoBehaviour
 	private IEnumerator LightsSequence()
 	{
 		yield return new WaitForSeconds(TimeBetweenLights);
-		YellowLight.TurnOn();
+		YellowLight.SetActive(true);
 		yield return new WaitForSeconds(TimeBetweenLights);
-		GreenLight.TurnOn();
+		GreenLight.SetActive(true);
 		FindObjectOfType<CarController>().EnableControls(true);
 		yield return new WaitForSeconds(TimeBetweenLights);
 		gameObject.SetActive(false);
