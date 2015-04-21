@@ -49,7 +49,7 @@ public class STMReceiver : MonoBehaviour
 			rotator.SetRotation ((byte)indata);*/
 
 		_controller.SetSteer(indata);
-
+		_controller.SetMoveDirection(true);
 	}
 
 
