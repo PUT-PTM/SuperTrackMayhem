@@ -30,7 +30,7 @@ public class CarController : MonoBehaviour
 			return;
 		}
 		// We move forward as default
-		_engine.SetGas(forward ? -1 : 1);
+		_engine.SetGas(forward ? 1 : -1);
 	}
 
 	public void SetSteer(float steer)

@@ -21,7 +21,7 @@ namespace UnityStandardAssets.Vehicles.Car
 			_steer = Mathf.Clamp(_steer, -1, 1);
 			var adjustedSteer = Mathf.Sign(_steer)*_steer*_steer;
 			_car.SetSteer(adjustedSteer);
-			_car.SetMoveDirection(Input.GetKey(KeyCode.Space));
+			_car.SetMoveDirection(!Input.GetKey(KeyCode.Space));
 		}
 	}
 }
