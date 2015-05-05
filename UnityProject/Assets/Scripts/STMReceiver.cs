@@ -12,7 +12,7 @@ public class STMReceiver :IDisposable
 
 	public STMReceiver()
 	{
-		Port = new SerialPort("COM4", 112500, Parity.None, 8, StopBits.One);
+		Port = new SerialPort("COM5", 112500, Parity.None, 8, StopBits.One);
 		if (Port == null)
 		{
 			Debug.Log("Error, Port = Null");
