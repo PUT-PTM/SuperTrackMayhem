@@ -54,10 +54,51 @@ public class STMReceiver :IDisposable
 
 	private void InternalStartListening()
 	{
+            int command;
+            Int16 axisX, axisY, axisZ, max;
+            byte crc;
+            byte[] buffer = new byte[2];
+
+           // command = Port.ReadByte();
+
+
+
+
 		while (_keepListenieng)
 		{
 			Port.BaseStream.Flush();
-			Data = Port.ReadByte();
+			//Data = Port.ReadByte();
+            command = Port.ReadByte();
+
+            if (command == 0xAA)
+            {
+                
+                Debug.Log("Accelerometer command nr: " + command + "\n");
+
+                buffer[0] = (byte)Port.ReadByte();
+                buffer[1] = (byte)Port.ReadByte();
+                axisX = BitConverter.ToInt16(buffer, 0);
+                Debug.Log("X axis: " + axisX + "\n");
+
+                buffer[0] = (byte)Port.ReadByte();
+                buffer[1] = (byte)Port.ReadByte();
+                Data = BitConverter.ToInt16(buffer, 0);
+                Debug.Log("Y axis: " + Data + "\n");
+
+                buffer[0] = (byte)Port.ReadByte();
+                buffer[1] = (byte)Port.ReadByte();
+                axisZ = BitConverter.ToInt16(buffer, 0);
+                Debug.Log("Z axis: " + axisZ + "\n");
+
+                buffer[0] = (byte)Port.ReadByte();
+                buffer[1] = (byte)Port.ReadByte();
+                max = BitConverter.ToInt16(buffer, 0);
+                Debug.Log("Accelerometer max: " + max + "\n");
+
+                crc = (byte)Port.ReadByte();
+                Debug.Log("CRC: " + crc + "\n\n");
+
+            }
 		}
 	}
 
