@@ -20,6 +20,9 @@ public class CarSTMControl : MonoBehaviour
 
 	void OnDestroy()
 	{
-		_receiver.Dispose();
+		if (_receiver != null)
+		{
+			_receiver.Dispose();
+		}
 	}
 }
