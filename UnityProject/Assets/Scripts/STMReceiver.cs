@@ -47,15 +47,13 @@ public class STMReceiver : MonoBehaviour
 			return;
 		}
 		Port.BaseStream.Flush();
-		int bytesReceived = Port.BytesToRead;
-		byte[] indata = new byte[bytesReceived];
-		Port.Read(indata, 0, bytesReceived);
+		char[] indata = Port.ReadExisting().ToCharArray();
 		Debug.Log(indata);
 		//Debug.Log(indata);
 		/*if(((position-indata)<7)||((position-indata)>-7))
 			rotator.SetRotation ((byte)indata);*/
 
-		_controller.SetSteer((((float) indata[bytesReceived - 1] - 128)/128));
+		_controller.SetSteer((((float) indata[indata.Length - 1] - 128)/128));
 		_controller.SetMoveDirection(true);
 	}
 
