@@ -6,7 +6,7 @@ public class STMReceiver : MonoBehaviour
 {
 	private CarController _controller;
 	private byte val;
-	public SerialPort Port = new SerialPort("COM5", 112500, Parity.None, 8, StopBits.One);
+	public SerialPort Port = new SerialPort("COM4", 112500, Parity.None, 8, StopBits.One);
 
 
 	void Start()

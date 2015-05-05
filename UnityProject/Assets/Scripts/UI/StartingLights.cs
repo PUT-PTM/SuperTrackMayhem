@@ -19,7 +19,7 @@ public class StartingLights : MonoBehaviour
 		YellowLight.SetActive(true);
 		yield return new WaitForSeconds(TimeBetweenLights);
 		GreenLight.SetActive(true);
-		FindObjectOfType<CarController>().EnableControls(true);
+		LevelManager.OnStartRace();
 		yield return new WaitForSeconds(TimeBetweenLights);
 		gameObject.SetActive(false);
 	}
