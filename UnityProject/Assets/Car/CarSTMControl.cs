@@ -15,7 +15,7 @@ public class CarSTMControl : MonoBehaviour
 	void Update()
 	{
 		_controller.SetSteer((((float)_receiver.Data - 128) / 128));
-		_controller.SetMoveDirection(true);
+		_controller.SetMoveDirection(!_receiver.Break);
 	}
 
 	void OnDestroy()

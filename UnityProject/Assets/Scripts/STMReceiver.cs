@@ -36,6 +36,7 @@ public class STMReceiver :IDisposable
 	}
 
 	public int Data;
+	public bool Break;
 
 	private bool _keepListenieng = true;
 	private Thread t;
@@ -98,7 +99,9 @@ public class STMReceiver :IDisposable
                 crc = (byte)Port.ReadByte();
                 Debug.Log("CRC: " + crc + "\n\n");
 
-            }
+			}
+
+			Break = false;
 		}
 	}
 
