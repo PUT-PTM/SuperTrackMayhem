@@ -74,7 +74,7 @@ public class STMReceiver :IDisposable
 
                 buffer[0] = (byte)Port.ReadByte();
                 buffer[1] = (byte)Port.ReadByte();
-                Int16 Data = BitConverter.ToInt16(buffer, 0);
+                Data = BitConverter.ToInt16(buffer, 0);
                 Debug.Log("Y axis: " + Data + "\n");
 
                 buffer[0] = (byte)Port.ReadByte();
@@ -91,9 +91,30 @@ public class STMReceiver :IDisposable
                 Debug.Log("CRC: " + crc + "\n\n");
 
 			}
+            else if (command == 0x38)
+            {
+                Debug.Log("Button command nr: " + command + "\n");
+                byte button1state = (byte)Port.ReadByte();
+                Debug.Log("Button 1 state: " + button1state + "\n");
 
-			Break = false;
+                byte button2state = (byte)Port.ReadByte();
+                //Debug.Log("Button 2 state: " + button2state + "\n");
+
+                byte button3state = (byte)Port.ReadByte();
+                //Debug.Log("Button 3 state: " + button3state + "\n");
+
+                byte button4state = (byte)Port.ReadByte();
+                //Debug.Log("Button 4 state: " + button4state + "\n");
+
+                byte crc = (byte)Port.ReadByte();
+                //Debug.Log("CRC: " + crc + "\n\n");
+
+                if (button1state != 0)
+                    Break = true;
+            }
+            Break = false;
 		}
+        
 	}
 
 	public void Dispose()
