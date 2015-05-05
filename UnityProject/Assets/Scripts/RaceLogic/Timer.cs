@@ -30,10 +30,6 @@ public class Timer : MonoBehaviour
 		float timeSinceStart = (Time.time - _timeStart);
 		float timeSinceCheckpoint = (Time.time - _timeLastCheckpoint);
 
-		Debug.Log("----------");
-		Debug.Log(timeSinceStart);
-		Debug.Log(timeSinceCheckpoint);
-
 		SinceStart.text = timeSinceStart.ToString("0.0");
 		SinceLastCheckpoint.text = timeSinceCheckpoint.ToString("0.0");
 	}
