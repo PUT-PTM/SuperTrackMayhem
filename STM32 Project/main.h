@@ -20,6 +20,7 @@
 #include "misc.h"
 #include "vcp.h"
 #include "accelerometer.h"
+#include "ucp.c"
 
 int main(void);
 

@@ -19,6 +19,7 @@
 #include "accelerometer.h"*/
 #include "main.h"
 
+
 int main(void)
 {
 
@@ -122,9 +123,18 @@ int main(void)
     LIS302DL_InterruptStruct.DoubleClick_Axes = LIS302DL_DOUBLECLICKINTERRUPT_Z_ENABLE;
     LIS302DL_InterruptConfig(&LIS302DL_InterruptStruct);
 
-    int8_t przyspieszenie_y;
+    int8_t przyspieszenie_x, przyspieszenie_y, przyspieszenie_z;
+    int j;
     while(1)
     {
+
+    	LIS302DL_Read(&przyspieszenie_x, LIS302DL_OUT_X_ADDR, 1);
+    	if(przyspieszenie_x>127)
+    	{
+			przyspieszenie_x=przyspieszenie_x-1;
+			przyspieszenie_x=(~przyspieszenie_x)&0xFF;
+			przyspieszenie_x=-przyspieszenie_x;
+    	}
 
         LIS302DL_Read(&przyspieszenie_y, LIS302DL_OUT_Y_ADDR, 1);
         if(przyspieszenie_y>127)
@@ -134,12 +144,34 @@ int main(void)
             przyspieszenie_y=-przyspieszenie_y;
         }
 
-        int j;
-        for(j=0;j<300000;j++){  //slowloop
+        LIS302DL_Read(&przyspieszenie_z, LIS302DL_OUT_Z_ADDR, 1);
+    	if(przyspieszenie_z>127)
+        {
+			przyspieszenie_z=przyspieszenie_z-1;
+			przyspieszenie_z=(~przyspieszenie_z)&0xFF;
+			przyspieszenie_z=-przyspieszenie_z;
+        }
+
+       for(j=0;j<300000;j++){  //slowloop
         }
 
        VCP_put_char((przyspieszenie_y)+128);
        //test=przyspieszenie_y+128;
+
+        accPacket_t accPacket;
+        accPacket.command=ACC_COMMAND_TYPE;
+        accPacket.x=przyspieszenie_x;
+        accPacket.y=przyspieszenie_y+128;
+        accPacket.z=przyspieszenie_z;
+        accPacket.max=ACC_MAX_SCOPE;
+        accPacket.crc=CRC_START;
+
+        VCP_send_buffer(&accPacket, sizeof(accPacket_t));
+
+
+
+
+
     }
 }
 
