@@ -1,18 +1,18 @@
+using System;
 using System.IO.Ports;
+using System.Threading;
 using UnityEngine;
 
 [RequireComponent(typeof (CarController))]
-public class STMReceiver : MonoBehaviour
+public class STMReceiver :IDisposable
 {
 	private CarController _controller;
 	private byte val;
-	public SerialPort Port = new SerialPort("COM4", 112500, Parity.None, 8, StopBits.One);
+	public SerialPort Port;
 
-
-	private void Start()
+	public STMReceiver()
 	{
-		//SerialPort Port = new SerialPort("COM5", 115200, Parity.None, 8, StopBits.One);
-		_controller = GetComponent<CarController>();
+		Port = new SerialPort("COM4", 112500, Parity.None, 8, StopBits.One);
 		if (Port == null)
 		{
 			Debug.Log("Error, Port = Null");
@@ -33,37 +33,36 @@ public class STMReceiver : MonoBehaviour
 		{
 			Debug.Log("Error, cannot open port");
 		}
-
-		Port.DataReceived += DataReceivedHandler;
 	}
 
-	private void Update()
+	public int Data;
+
+	private bool _keepListenieng = true;
+	private Thread t;
+	public void StartListening()
 	{
-		//Debug.Log("wywolanie funkcji");
-		//Debug.Log(Port.ReadExisting());
-		//Port.BaseStream.Flush();
 		if (!Port.IsOpen)
 		{
+			Debug.Log("Port is not open, cannot start listening");
 			return;
 		}
-		Port.BaseStream.Flush();
-		char[] indata = Port.ReadExisting().ToCharArray();
-		Debug.Log(indata);
-		//Debug.Log(indata);
-		/*if(((position-indata)<7)||((position-indata)>-7))
-			rotator.SetRotation ((byte)indata);*/
-
-		_controller.SetSteer((((float) indata[indata.Length - 1] - 128)/128));
-		_controller.SetMoveDirection(true);
+		t = new Thread(InternalStartListening);
+		_keepListenieng = true;
+		t.Start(); 
 	}
 
 
-	private void DataReceivedHandler(object sender, SerialDataReceivedEventArgs e)
+	private void InternalStartListening()
 	{
-		Debug.Log("obsluga zdarzenia");
-		SerialPort sp = (SerialPort) sender;
-		string indata = sp.ReadLine();
-		Debug.Log(indata);
-		//	val=byte.Parse(indata);
+		while (_keepListenieng)
+		{
+			Port.BaseStream.Flush();
+			Data = Port.ReadByte();
+		}
+	}
+
+	public void Dispose()
+	{
+		_keepListenieng = false;
 	}
 }
