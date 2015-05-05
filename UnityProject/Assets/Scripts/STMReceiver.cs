@@ -41,14 +41,20 @@ public class STMReceiver : MonoBehaviour
 		//Debug.Log("wywolanie funkcji");
 		//Debug.Log(Port.ReadExisting());
 		//Port.BaseStream.Flush();
+		if (!Port.IsOpen)
+		{
+			return;
+		}
 		Port.BaseStream.Flush();
-		int indata = Port.ReadByte();
+		int bytesReceived = Port.BytesToRead;
+		byte[] indata = new byte[bytesReceived];
+		Port.Read(indata, 0, bytesReceived);
 		Debug.Log (indata);
 		//Debug.Log(indata);
 		/*if(((position-indata)<7)||((position-indata)>-7))
 			rotator.SetRotation ((byte)indata);*/
 
-		_controller.SetSteer(((float)indata - 128)/128);
+		_controller.SetSteer((((float)indata[bytesReceived-1] - 128)/128);
 		_controller.SetMoveDirection(true);
 	}
 
