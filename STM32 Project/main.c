@@ -27,7 +27,7 @@ int main(void)
     init();
     SystemCoreClockUpdate(); // inicjalizacja dystrybucji czasu procesora
 
-
+    RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA, ENABLE);//timer to button
 
     /* Enable the SPI periph */
     RCC_APB2PeriphClockCmd(LIS302DL_SPI_CLK, ENABLE);
@@ -123,6 +123,10 @@ int main(void)
     LIS302DL_InterruptStruct.DoubleClick_Axes = LIS302DL_DOUBLECLICKINTERRUPT_Z_ENABLE;
     LIS302DL_InterruptConfig(&LIS302DL_InterruptStruct);
 
+    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0;
+    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN;
+    GPIO_Init(GPIOA, &GPIO_InitStructure);
+
     int8_t przyspieszenie_x, przyspieszenie_y, przyspieszenie_z;
     int j;
     while(1)
@@ -155,7 +159,7 @@ int main(void)
        for(j=0;j<300000;j++){  //slowloop
         }
 
-       VCP_put_char((przyspieszenie_y)+128);
+       //VCP_put_char((przyspieszenie_y)+128);
        //test=przyspieszenie_y+128;
 
         accPacket_t accPacket;
@@ -167,6 +171,20 @@ int main(void)
         accPacket.crc=CRC_START;
 
         VCP_send_buffer(&accPacket, sizeof(accPacket_t));
+
+
+        buttonPacket_t buttonPacket;
+        buttonPacket.command=BUTTON_COMMAND_TYPE;
+        if(GPIO_ReadInputDataBit(GPIOA, GPIO_Pin_0))
+        	buttonPacket.butt1_state=BUTTON_CLICKED;
+        else
+        	buttonPacket.butt1_state=BUTTON_NO_CLICKED;
+        buttonPacket.butt2_state=BUTTON_NO_CLICKED;
+        buttonPacket.butt3_state=BUTTON_NO_CLICKED;
+        buttonPacket.butt4_state=BUTTON_NO_CLICKED;
+        buttonPacket.crc=CRC_START;
+        VCP_send_buffer(&buttonPacket, sizeof(buttonPacket_t));
+
 
 
 

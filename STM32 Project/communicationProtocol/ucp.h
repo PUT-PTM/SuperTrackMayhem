@@ -9,6 +9,7 @@
 
 #define BUTTON_COMMAND_TYPE 0x38
 #define BUTTON_CLICKED 0xFF
+#define BUTTON_NO_CLICKED 0x00
 
 typedef struct __attribute__((packed)) accPacket
 {
@@ -22,8 +23,10 @@ typedef struct __attribute__((packed)) accPacket
 
 typedef struct __attribute__((packed)) buttonPacket
 {
+	uint8_t command;
 	uint8_t butt1_state;
 	uint8_t butt2_state;
 	uint8_t butt3_state;
 	uint8_t butt4_state;
+	uint8_t crc;
 }buttonPacket_t;

@@ -109,10 +109,12 @@ public class STMReceiver :IDisposable
                 byte crc = (byte)Port.ReadByte();
                 //Debug.Log("CRC: " + crc + "\n\n");
 
-                if (button1state != 0)
+                if (button1state == 0)
+                    Break = false;
+                else
                     Break = true;
             }
-            Break = false;
+          //  Break = false;
 		}
         
 	}
