@@ -54,23 +54,14 @@ public class STMReceiver :IDisposable
 
 
 	private void InternalStartListening()
-	{
-            int command;
-            Int16 axisX, axisY, axisZ, max;
-            byte crc;
-            byte[] buffer = new byte[2];
-
+	{       
            // command = Port.ReadByte();
-
-
-
-
 		while (_keepListenieng)
 		{
 			Port.BaseStream.Flush();
 			//Data = Port.ReadByte();
-            command = Port.ReadByte();
-
+            int command = Port.ReadByte();
+            byte[] buffer = new byte[2];
             if (command == 0xAA)
             {
                 
@@ -78,25 +69,25 @@ public class STMReceiver :IDisposable
 
                 buffer[0] = (byte)Port.ReadByte();
                 buffer[1] = (byte)Port.ReadByte();
-                axisX = BitConverter.ToInt16(buffer, 0);
+                Int16 axisX = BitConverter.ToInt16(buffer, 0);
                 Debug.Log("X axis: " + axisX + "\n");
 
                 buffer[0] = (byte)Port.ReadByte();
                 buffer[1] = (byte)Port.ReadByte();
-                Data = BitConverter.ToInt16(buffer, 0);
+                Int16 Data = BitConverter.ToInt16(buffer, 0);
                 Debug.Log("Y axis: " + Data + "\n");
 
                 buffer[0] = (byte)Port.ReadByte();
                 buffer[1] = (byte)Port.ReadByte();
-                axisZ = BitConverter.ToInt16(buffer, 0);
+                Int16 axisZ = BitConverter.ToInt16(buffer, 0);
                 Debug.Log("Z axis: " + axisZ + "\n");
 
                 buffer[0] = (byte)Port.ReadByte();
                 buffer[1] = (byte)Port.ReadByte();
-                max = BitConverter.ToInt16(buffer, 0);
+                Int16 max = BitConverter.ToInt16(buffer, 0);
                 Debug.Log("Accelerometer max: " + max + "\n");
 
-                crc = (byte)Port.ReadByte();
+                byte crc = (byte)Port.ReadByte();
                 Debug.Log("CRC: " + crc + "\n\n");
 
 			}
