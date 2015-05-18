@@ -30,3 +30,9 @@ typedef struct __attribute__((packed)) buttonPacket
 	uint8_t butt4_state;
 	uint8_t crc;
 }buttonPacket_t;
+
+typedef struct __attribute__((packed)) ledSequencePacket
+{
+	uint8_t command;
+	uint8_t sequence_number;
+}ledSequencePacket_t;
