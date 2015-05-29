@@ -5,8 +5,7 @@ public class StartingLights : MonoBehaviour
 {
 	public float TimeBetweenLights;
 
-	public GameObject YellowLight;
-	public GameObject GreenLight;
+	public GameObject[] Lights;
 
 	private void Start()
 	{
@@ -15,10 +14,11 @@ public class StartingLights : MonoBehaviour
 
 	private IEnumerator LightsSequence()
 	{
-		yield return new WaitForSeconds(TimeBetweenLights);
-		YellowLight.SetActive(true);
-		yield return new WaitForSeconds(TimeBetweenLights);
-		GreenLight.SetActive(true);
+		for (int i = 0; i < Lights.Length; i++)
+		{
+			yield return new WaitForSeconds(TimeBetweenLights);
+			Lights[i].SetActive(true);
+		}
 		LevelManager.OnStartRace();
 		yield return new WaitForSeconds(TimeBetweenLights);
 		gameObject.SetActive(false);
