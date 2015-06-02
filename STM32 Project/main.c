@@ -127,8 +127,21 @@ int main(void)
     GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN;
     GPIO_Init(GPIOA, &GPIO_InitStructure);
 
+
+    /*===========================================================*/
     int8_t przyspieszenie_x, przyspieszenie_y, przyspieszenie_z;
     int j;
+
+    /*inicjalizacja pakietu akcelerometru*/
+    accPacket_t accPacket;
+    accPacket.start_flag=NEW_PACKET;
+    accPacket.command=ACC_COMMAND_TYPE;
+
+    /*inicjalizacja pakietu przycisku*/
+    buttonPacket_t buttonPacket;
+    buttonPacket.start_flag=NEW_PACKET;
+    buttonPacket.command=BUTTON_COMMAND_TYPE;
+
     while(1)
     {
 
@@ -159,22 +172,18 @@ int main(void)
        for(j=0;j<300000;j++){  //slowloop
         }
 
-       //VCP_put_char((przyspieszenie_y)+128);
-       //test=przyspieszenie_y+128;
 
-        accPacket_t accPacket;
-        accPacket.command=ACC_COMMAND_TYPE;
+        /*ustawienie wartosci pakietu dla akcelerometru*/
         accPacket.x=przyspieszenie_x;
-        accPacket.y=przyspieszenie_y+128;
+        accPacket.y=przyspieszenie_y;
         accPacket.z=przyspieszenie_z;
-        accPacket.max=ACC_MAX_SCOPE;
         accPacket.crc=CRC_START;
 
+        /*wyslanie pakietu akcelerometru*/
         VCP_send_buffer(&accPacket, sizeof(accPacket_t));
 
 
-        buttonPacket_t buttonPacket;
-        buttonPacket.command=BUTTON_COMMAND_TYPE;
+        /*ustawienie wartosci dla pakietu przycisku*/
         if(GPIO_ReadInputDataBit(GPIOA, GPIO_Pin_0))
         	buttonPacket.butt1_state=BUTTON_CLICKED;
         else
@@ -183,6 +192,7 @@ int main(void)
         buttonPacket.butt3_state=BUTTON_NO_CLICKED;
         buttonPacket.butt4_state=BUTTON_NO_CLICKED;
         buttonPacket.crc=CRC_START;
+        /*wyslanie pakietu przycisku*/
         VCP_send_buffer(&buttonPacket, sizeof(buttonPacket_t));
 
 

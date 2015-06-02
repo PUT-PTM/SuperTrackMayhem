@@ -2,27 +2,40 @@
 #include <stdio.h>
 #include "misc.h"
 
-#define ACC_COMMAND_TYPE 0xAA
-#define ACC_MAX_SCOPE 511
-#define CRC_START 99
+#define SYNC_COMAND 0x01
+#define PROTOCOL_V1 0x01
+#define NEW_PACKET 0xAA
+
+#define ACC_COMMAND_TYPE 0xAC
 #define ACC_PACKET_SIZE 80
+
+#define CRC_START 99
 
 #define BUTTON_COMMAND_TYPE 0x38
 #define BUTTON_CLICKED 0xFF
 #define BUTTON_NO_CLICKED 0x00
 
+typedef struct __attribute__((packed)) syncPacket
+{
+	uint8_t start_flag;
+	uint8_t command;
+	uint8_t protocol_version;
+}accPacket_t;
+
+
 typedef struct __attribute__((packed)) accPacket
 {
+	uint8_t start_flag;
 	uint8_t command;
-	int16_t x;
-	int16_t y;
-	int16_t z;
-	int16_t max;
+	float x;
+	float y;
+	float z;
 	uint8_t crc;
 }accPacket_t;
 
 typedef struct __attribute__((packed)) buttonPacket
 {
+	uint8_t start_flag;
 	uint8_t command;
 	uint8_t butt1_state;
 	uint8_t butt2_state;
@@ -33,6 +46,7 @@ typedef struct __attribute__((packed)) buttonPacket
 
 typedef struct __attribute__((packed)) ledSequencePacket
 {
+	uint8_t start_flag;
 	uint8_t command;
 	uint8_t sequence_number;
 }ledSequencePacket_t;
