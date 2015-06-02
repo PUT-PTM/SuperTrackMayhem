@@ -175,7 +175,7 @@ int main(void)
 
         /*ustawienie wartosci pakietu dla akcelerometru*/
         accPacket.x=przyspieszenie_x;
-        accPacket.y=przyspieszenie_y;
+        accPacket.y=((przyspieszenie_y+128)/128)*9.8;
         accPacket.z=przyspieszenie_z;
         accPacket.crc=CRC_START;
 
