@@ -157,8 +157,8 @@ int main(void)
 
     /* Konfiguracja Timera */
     TIM_TimeBaseInitTypeDef TIM_TimeBaseStructure;
-    TIM_TimeBaseStructure.TIM_Period = 999;
-    TIM_TimeBaseStructure.TIM_Prescaler = 50 - 1;
+    TIM_TimeBaseStructure.TIM_Period = 1999;
+    TIM_TimeBaseStructure.TIM_Prescaler = 550 - 1;
     TIM_TimeBaseStructure.TIM_ClockDivision = TIM_CKD_DIV1;
     TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up ;
     TIM_TimeBaseInit(TIM2, &TIM_TimeBaseStructure);
@@ -201,7 +201,7 @@ int main(void)
         accPacket.x=przyspieszenie_x;
        // accPacket.y=((przyspieszenie_y+128)/128)*9.8;
      //   accPacket.y=(przyspieszenie_y+4)/128*9.8;
-        accPacket.y=przyspieszenie_y;
+        accPacket.y=przyspieszenie_y+128;
         accPacket.z=przyspieszenie_z;
         accPacket.crc=CRC_START;
 

@@ -81,11 +81,15 @@ public class STMReceiver :IDisposable
 
                     buffer[0] = (byte)Port.ReadByte();
                     buffer[1] = (byte)Port.ReadByte();
+                    buffer[2] = (byte)Port.ReadByte();
+                    buffer[3] = (byte)Port.ReadByte();
                     Data = BitConverter.ToSingle(buffer, 0);
                     Debug.Log("Y axis: " + Data + "\n");
 
                     buffer[0] = (byte)Port.ReadByte();
                     buffer[1] = (byte)Port.ReadByte();
+                    buffer[2] = (byte)Port.ReadByte();
+                    buffer[3] = (byte)Port.ReadByte();
                     float axisZ = BitConverter.ToSingle(buffer, 0);
                     Debug.Log("Z axis: " + axisZ + "\n");
 
