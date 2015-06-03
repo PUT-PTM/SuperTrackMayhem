@@ -20,7 +20,7 @@ typedef struct __attribute__((packed)) syncPacket
 	uint8_t start_flag;
 	uint8_t command;
 	uint8_t protocol_version;
-}accPacket_t;
+}syncPacket_t;
 
 
 typedef struct __attribute__((packed)) accPacket

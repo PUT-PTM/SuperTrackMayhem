@@ -142,8 +142,32 @@ int main(void)
     buttonPacket.start_flag=NEW_PACKET;
     buttonPacket.command=BUTTON_COMMAND_TYPE;
 
+
+    /*timery*/
+    RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM2, ENABLE);
+    RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOD, ENABLE);
+
+    /* Konfiguracja diod */
+    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_12 | GPIO_Pin_13| GPIO_Pin_14| GPIO_Pin_15;
+    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
+    GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
+    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_100MHz;
+    GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
+    GPIO_Init(GPIOD, &GPIO_InitStructure);
+
+    /* Konfiguracja Timera */
+    TIM_TimeBaseInitTypeDef TIM_TimeBaseStructure;
+    TIM_TimeBaseStructure.TIM_Period = 999;
+    TIM_TimeBaseStructure.TIM_Prescaler = 50 - 1;
+    TIM_TimeBaseStructure.TIM_ClockDivision = TIM_CKD_DIV1;
+    TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up ;
+    TIM_TimeBaseInit(TIM2, &TIM_TimeBaseStructure);
+
+
     while(1)
     {
+    	TIM_Cmd(TIM2, ENABLE);// wlaczenie timera
+
 
     	LIS302DL_Read(&przyspieszenie_x, LIS302DL_OUT_X_ADDR, 1);
     	if(przyspieszenie_x>127)
@@ -169,13 +193,15 @@ int main(void)
 			przyspieszenie_z=-przyspieszenie_z;
         }
 
-       for(j=0;j<300000;j++){  //slowloop
-        }
+   //    for(j=0;j<300000;j++){  //slowloop
+     //   }
 
 
         /*ustawienie wartosci pakietu dla akcelerometru*/
         accPacket.x=przyspieszenie_x;
-        accPacket.y=((przyspieszenie_y+128)/128)*9.8;
+       // accPacket.y=((przyspieszenie_y+128)/128)*9.8;
+     //   accPacket.y=(przyspieszenie_y+4)/128*9.8;
+        accPacket.y=przyspieszenie_y;
         accPacket.z=przyspieszenie_z;
         accPacket.crc=CRC_START;
 
@@ -196,7 +222,11 @@ int main(void)
         VCP_send_buffer(&buttonPacket, sizeof(buttonPacket_t));
 
 
-
+        while(1)
+        	if(TIM_GetFlagStatus(TIM2, TIM_FLAG_Update)) {
+        		TIM_ClearFlag(TIM2, TIM_FLAG_Update);
+        		break;
+        	}
 
 
 

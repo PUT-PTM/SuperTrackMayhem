@@ -7,6 +7,7 @@
 #include "stm32f4xx_rcc.h"
 #include "stm32f4xx_exti.h"
 #include "stm32f4xx_spi.h"
+#include "stm32f4xx_tim.h"
 
 #include "usbd_cdc_core.h"
 #include "usbd_usr.h"
