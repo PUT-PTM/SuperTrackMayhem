@@ -49,6 +49,7 @@ int main(void)
     GPIO_PinAFConfig(LIS302DL_SPI_MOSI_GPIO_PORT, LIS302DL_SPI_MOSI_SOURCE, LIS302DL_SPI_MOSI_AF);
 
     GPIO_InitTypeDef GPIO_InitStructure;
+    /*initSPI(&GPIO_InitStructure,&SPI_InitStructur);*/
     GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;
     GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
     GPIO_InitStructure.GPIO_PuPd  = GPIO_PuPd_DOWN;
@@ -84,6 +85,7 @@ int main(void)
     SPI_Cmd(LIS302DL_SPI, ENABLE);
 
     /* Configure GPIO PIN for Lis Chip select */
+    /*configGPIOforListChip(&GPIO_InitStructure)*/
     GPIO_InitStructure.GPIO_Pin = LIS302DL_SPI_CS_PIN;
     GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
     GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
@@ -107,7 +109,8 @@ int main(void)
 
     LIS302DL_InitTypeDef  LIS302DL_InitStruct;
   //  uint8_t ctrl = 0x00;
-
+    /*LIS302DL_InterruptConfigTypeDef LIS302DL_InterruptStruct*/
+/*initLIS302DL(&LIS302DL_InitStruct, &LIS302DL_InterruptStruct)*/
     /* Set configuration of LIS302DL*/
     LIS302DL_InitStruct.Power_Mode = LIS302DL_LOWPOWERMODE_ACTIVE;
     LIS302DL_InitStruct.Output_DataRate = LIS302DL_DATARATE_100;
@@ -123,6 +126,8 @@ int main(void)
     LIS302DL_InterruptStruct.DoubleClick_Axes = LIS302DL_DOUBLECLICKINTERRUPT_Z_ENABLE;
     LIS302DL_InterruptConfig(&LIS302DL_InterruptStruct);
 
+
+    /* initButton(&GPIO_InitStructure);*/
     GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0;
     GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN;
     GPIO_Init(GPIOA, &GPIO_InitStructure);
@@ -148,6 +153,7 @@ int main(void)
     RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOD, ENABLE);
 
     /* Konfiguracja diod */
+    /*initLeds( GPIO_InitStructure)*/
     GPIO_InitStructure.GPIO_Pin = GPIO_Pin_12 | GPIO_Pin_13| GPIO_Pin_14| GPIO_Pin_15;
     GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
     GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
@@ -156,6 +162,7 @@ int main(void)
     GPIO_Init(GPIOD, &GPIO_InitStructure);
 
     /* Konfiguracja Timera */
+    /*initTim2(&TIM_TimeBaseStructure)*/
     TIM_TimeBaseInitTypeDef TIM_TimeBaseStructure;
     TIM_TimeBaseStructure.TIM_Period = 1999;
     TIM_TimeBaseStructure.TIM_Prescaler = 550 - 1;
@@ -170,29 +177,30 @@ int main(void)
 
 
     	LIS302DL_Read(&przyspieszenie_x, LIS302DL_OUT_X_ADDR, 1);
-    	if(przyspieszenie_x>127)
+    	/*if(przyspieszenie_x>127)
     	{
 			przyspieszenie_x=przyspieszenie_x-1;
 			przyspieszenie_x=(~przyspieszenie_x)&0xFF;
 			przyspieszenie_x=-przyspieszenie_x;
-    	}
+    	}*/
 
         LIS302DL_Read(&przyspieszenie_y, LIS302DL_OUT_Y_ADDR, 1);
-        if(przyspieszenie_y>127)
+        /*if(przyspieszenie_y>127)
         {
             przyspieszenie_y=przyspieszenie_y-1;
             przyspieszenie_y=(~przyspieszenie_y)&0xFF;
             przyspieszenie_y=-przyspieszenie_y;
-        }
+        }*/
 
         LIS302DL_Read(&przyspieszenie_z, LIS302DL_OUT_Z_ADDR, 1);
-    	if(przyspieszenie_z>127)
+    	/*if(przyspieszenie_z>127)
         {
 			przyspieszenie_z=przyspieszenie_z-1;
 			przyspieszenie_z=(~przyspieszenie_z)&0xFF;
 			przyspieszenie_z=-przyspieszenie_z;
-        }
+        }*/
 
+        asixNormalization(&przyspieszenie_x, &przyspieszenie_y, &przyspieszenie_z);
    //    for(j=0;j<300000;j++){  //slowloop
      //   }
 
@@ -200,10 +208,12 @@ int main(void)
         /*ustawienie wartosci pakietu dla akcelerometru*/
         accPacket.x=przyspieszenie_x;
        // accPacket.y=((przyspieszenie_y+128)/128)*9.8;
-     //   accPacket.y=(przyspieszenie_y+4)/128*9.8;
-        accPacket.y=przyspieszenie_y+128;
+        accPacket.y=(przyspieszenie_y*9.8f)/128;
+       // accPacket.y=(przyspieszenie_y+4)/128*9.8;
+      //  accPacket.y=przyspieszenie_y+128;
         accPacket.z=przyspieszenie_z;
         accPacket.crc=CRC_START;
+        /*setAccelerometerPacketField(&accPacket, przyspieszenie_x, przyspieszenie_y, przyspieszenie_z);*/
 
         /*wyslanie pakietu akcelerometru*/
         VCP_send_buffer(&accPacket, sizeof(accPacket_t));
@@ -218,6 +228,7 @@ int main(void)
         buttonPacket.butt3_state=BUTTON_NO_CLICKED;
         buttonPacket.butt4_state=BUTTON_NO_CLICKED;
         buttonPacket.crc=CRC_START;
+        /*setButtonPacketField(&buttonPacket)*/
         /*wyslanie pakietu przycisku*/
         VCP_send_buffer(&buttonPacket, sizeof(buttonPacket_t));
 
