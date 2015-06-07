@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 [RequireComponent(typeof (Rigidbody))]
 public class Engine : MonoBehaviour
@@ -9,6 +10,7 @@ public class Engine : MonoBehaviour
 	public float BreakingForce;
 	public float ForwardForce;
 	public WheelCollider[] RearWheels;
+	public float BreakingThreshold = -0.1f;
 
 	private void Awake()
 	{
@@ -24,7 +26,7 @@ public class Engine : MonoBehaviour
 	private void FixedUpdate()
 	{
 		var dot = Vector3.Dot(_transform.forward*_gas, _rigidbody.velocity);
-		var breaking = dot < 0;
+		var breaking = dot < BreakingThreshold;
 
 		if (breaking)
 		{
