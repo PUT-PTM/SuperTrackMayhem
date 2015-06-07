@@ -52,7 +52,7 @@ public class ConfigReader
 
     public static bool TryGetValue(string key, out string value)
     {
-        return _instance.fileContent.TryGetValue(key, out value);
+        return Instance.fileContent.TryGetValue(key, out value);
     }
 
     public static bool TryGetInt(string key, out int value)
