@@ -1,6 +1,3 @@
-# SuperTrackMayhem
-
-##Overview
 # SuperTrackMayhem 
 is a simple racing game created as a university project for Microprocessors lab at the Poznan University of Technology. The car can be controlled by both a  keyboard and an accelerometer built into the STM32F407 Discovery board.
 
@@ -15,9 +12,13 @@ The game itself including the STM connector, and one sample level.
 
 ### Tools
 [CooCox IDE](www.coocox.com) v1.7.7
+
 [GNU ARM Toolchain](https://launchpad.net/gcc-arm-embedded) v4.8.2014q3
+
 [Unity Engine](https://unity3d.com/) v5.0.2f1
+
 [Blender](http://www.blender.org/) v2.74
+
 [Gimp](http://www.gimp.org/) v2.8.14
 
 
@@ -46,5 +47,6 @@ SuperTrackMayhem is released under the [MIT License](http://opensource.org/licen
 Project made by *Jacek Przemieniecki* and *Bartosz Litwiniuk*.
 
 *The project was conducted during the Microprocessor Lab course held by the Institute of Control and Information Engineering, Poznan University of Technology.*
-Supervisor: [Michał Fularz](https://github.com/Michal-Fularz)
+
+*Supervisor: [Michał Fularz](https://github.com/Michal-Fularz)
 
