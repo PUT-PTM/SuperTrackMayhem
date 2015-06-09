@@ -1,9 +1,4 @@
-
-
-
 #include "stm32f4xx_tim.h"
-
-
 #include "accelerometer.h"
 
 #define SYNC_COMAND 0x01
@@ -25,7 +20,6 @@ typedef struct __attribute__((packed)) syncPacket
 	uint8_t command;
 	uint8_t protocol_version;
 }syncPacket_t;
-
 
 typedef struct __attribute__((packed)) accPacket
 {
@@ -55,13 +49,6 @@ typedef struct __attribute__((packed)) ledSequencePacket
 	uint8_t sequence_number;
 }ledSequencePacket_t;
 
-void asixNormalization(int8_t* przyspieszenie_x, int8_t* przyspieszenie_y, int8_t* przyspieszenie_z);
-void initTim2(TIM_TimeBaseInitTypeDef* TIM_TimeBaseStructure);
-void initLeds(GPIO_InitTypeDef* GPIO_InitStructure);
-void initButton(GPIO_InitTypeDef* GPIO_InitStructure);
-void setAccelerometerPacketField(accPacket_t* accPacket, int8_t przyspieszenie_x, int8_t przyspieszenie_y, int8_t przyspieszenie_z);
+void asixNormalization(int8_t* acceleration_x, int8_t* acceleration_y, int8_t* acceleration_z);
+void setAccelerometerPacketField(accPacket_t* accPacket, int8_t acceleration_x, int8_t acceleration_y, int8_t acceleration_z);
 void setButtonPacketField(buttonPacket_t* buttonPacket );
-void initLIS302DL(LIS302DL_InitTypeDef*  LIS302DL_InitStruct, LIS302DL_InterruptConfigTypeDef* LIS302DL_InterruptStruct);
-void initSPI(GPIO_InitTypeDef* GPIO_InitStructure, SPI_InitTypeDef*  SPI_InitStructure);
-void configGPIOforListChip(GPIO_InitTypeDef* GPIO_InitStructure);
-

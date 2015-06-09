@@ -1,55 +1,19 @@
-/*#include "stm32f4xx_conf.h"
-#include "stm32f4xx.h"
-#include "stm32f4xx_gpio.h"
-#include "stm32f4xx_rcc.h"
-#include "stm32f4xx_exti.h"
-#include "stm32f4xx_spi.h"
-
-#include "usbd_cdc_core.h"
-#include "usbd_usr.h"
-#include "usbd_desc.h"
-#include "usbd_cdc_vcp.h"
-#include "usb_dcd_int.h"
-
-#include <stdlib.h>
-#include <stdio.h>
-
-#include "misc.h"
-#include "vcp.h"
-#include "accelerometer.h"*/
 #include "main.h"
-
 
 int main(void)
 {
-
     SystemInit();
     init();
-    SystemCoreClockUpdate(); // inicjalizacja dystrybucji czasu procesora
 
-    RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA, ENABLE);//timer to button
+    /* initialize the CPU time distribution */
+    SystemCoreClockUpdate(); //
 
-    /* Enable the SPI periph */
-    RCC_APB2PeriphClockCmd(LIS302DL_SPI_CLK, ENABLE);
+    /* enable clocks for GPIOA, SPI, SCK, MOSI, MISO, CS GPIO, INT1 GPIO, INT2 GPIO, TIM2, GPIOD */
+    enableClocks();
 
-    /* Enable SCK, MOSI and MISO GPIO clocks */
-    RCC_AHB1PeriphClockCmd(LIS302DL_SPI_SCK_GPIO_CLK | LIS302DL_SPI_MISO_GPIO_CLK | LIS302DL_SPI_MOSI_GPIO_CLK, ENABLE);
-
-    /* Enable CS  GPIO clock */
-    RCC_AHB1PeriphClockCmd(LIS302DL_SPI_CS_GPIO_CLK, ENABLE);
-
-    /* Enable INT1 GPIO clock */
-    RCC_AHB1PeriphClockCmd(LIS302DL_SPI_INT1_GPIO_CLK, ENABLE);
-
-    /* Enable INT2 GPIO clock */
-    RCC_AHB1PeriphClockCmd(LIS302DL_SPI_INT2_GPIO_CLK, ENABLE);
-
-    GPIO_PinAFConfig(LIS302DL_SPI_SCK_GPIO_PORT, LIS302DL_SPI_SCK_SOURCE, LIS302DL_SPI_SCK_AF);
-    GPIO_PinAFConfig(LIS302DL_SPI_MISO_GPIO_PORT, LIS302DL_SPI_MISO_SOURCE, LIS302DL_SPI_MISO_AF);
-    GPIO_PinAFConfig(LIS302DL_SPI_MOSI_GPIO_PORT, LIS302DL_SPI_MOSI_SOURCE, LIS302DL_SPI_MOSI_AF);
+    gpio_PinAFConfig();
 
     GPIO_InitTypeDef GPIO_InitStructure;
-    /*initSPI(&GPIO_InitStructure,&SPI_InitStructur);*/
     GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;
     GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
     GPIO_InitStructure.GPIO_PuPd  = GPIO_PuPd_DOWN;
@@ -79,13 +43,13 @@ int main(void)
     SPI_InitStructure.SPI_FirstBit = SPI_FirstBit_MSB;
     SPI_InitStructure.SPI_CRCPolynomial = 7;
     SPI_InitStructure.SPI_Mode = SPI_Mode_Master;
+
     SPI_Init(LIS302DL_SPI, &SPI_InitStructure);
 
     /* Enable SPI1  */
     SPI_Cmd(LIS302DL_SPI, ENABLE);
 
     /* Configure GPIO PIN for Lis Chip select */
-    /*configGPIOforListChip(&GPIO_InitStructure)*/
     GPIO_InitStructure.GPIO_Pin = LIS302DL_SPI_CS_PIN;
     GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
     GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
@@ -106,65 +70,31 @@ int main(void)
     GPIO_InitStructure.GPIO_Pin = LIS302DL_SPI_INT2_PIN;
     GPIO_Init(LIS302DL_SPI_INT2_GPIO_PORT, &GPIO_InitStructure);
 
-
     LIS302DL_InitTypeDef  LIS302DL_InitStruct;
-  //  uint8_t ctrl = 0x00;
-    /*LIS302DL_InterruptConfigTypeDef LIS302DL_InterruptStruct*/
-/*initLIS302DL(&LIS302DL_InitStruct, &LIS302DL_InterruptStruct)*/
-    /* Set configuration of LIS302DL*/
-    LIS302DL_InitStruct.Power_Mode = LIS302DL_LOWPOWERMODE_ACTIVE;
-    LIS302DL_InitStruct.Output_DataRate = LIS302DL_DATARATE_100;
-    LIS302DL_InitStruct.Axes_Enable = LIS302DL_X_ENABLE | LIS302DL_Y_ENABLE | LIS302DL_Z_ENABLE;
-    LIS302DL_InitStruct.Full_Scale = LIS302DL_FULLSCALE_2_3;
-    LIS302DL_InitStruct.Self_Test = LIS302DL_SELFTEST_NORMAL;
-    LIS302DL_Init(&LIS302DL_InitStruct);
-
     LIS302DL_InterruptConfigTypeDef LIS302DL_InterruptStruct;
-    /* Set configuration of Internal High Pass Filter of LIS302DL*/
-    LIS302DL_InterruptStruct.Latch_Request = LIS302DL_INTERRUPTREQUEST_LATCHED;
-    LIS302DL_InterruptStruct.SingleClick_Axes = LIS302DL_CLICKINTERRUPT_Z_ENABLE;
-    LIS302DL_InterruptStruct.DoubleClick_Axes = LIS302DL_DOUBLECLICKINTERRUPT_Z_ENABLE;
+    initLIS302DL(&LIS302DL_InitStruct, &LIS302DL_InterruptStruct);
+    LIS302DL_Init(&LIS302DL_InitStruct);
     LIS302DL_InterruptConfig(&LIS302DL_InterruptStruct);
 
-
-    /* initButton(&GPIO_InitStructure);*/
-    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0;
-    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN;
+    initButton(&GPIO_InitStructure);
     GPIO_Init(GPIOA, &GPIO_InitStructure);
 
-
-    /*===========================================================*/
-    int8_t przyspieszenie_x, przyspieszenie_y, przyspieszenie_z;
-    int j;
-
-    /*inicjalizacja pakietu akcelerometru*/
+    int8_t acceleration_x, acceleration_y, acceleration_z;
+    /* accelerometer packet initialization */
     accPacket_t accPacket;
     accPacket.start_flag=NEW_PACKET;
     accPacket.command=ACC_COMMAND_TYPE;
 
-    /*inicjalizacja pakietu przycisku*/
+    /* button package initialization */
     buttonPacket_t buttonPacket;
-    buttonPacket.start_flag=NEW_PACKET;
-    buttonPacket.command=BUTTON_COMMAND_TYPE;
 
-
-    /*timery*/
-    RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM2, ENABLE);
-    RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOD, ENABLE);
-
-    /* Konfiguracja diod */
-    /*initLeds( GPIO_InitStructure)*/
-    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_12 | GPIO_Pin_13| GPIO_Pin_14| GPIO_Pin_15;
-    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
-    GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
-    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_100MHz;
-    GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
+    /* Leds Configuration */
+    initLeds(&GPIO_InitStructure);
     GPIO_Init(GPIOD, &GPIO_InitStructure);
 
-    /* Konfiguracja Timera */
-    /*initTim2(&TIM_TimeBaseStructure)*/
+    /* Timer2 Configuration */
     TIM_TimeBaseInitTypeDef TIM_TimeBaseStructure;
-    TIM_TimeBaseStructure.TIM_Period = 1999;
+    TIM_TimeBaseStructure.TIM_Period = 1299;//1999,999
     TIM_TimeBaseStructure.TIM_Prescaler = 550 - 1;
     TIM_TimeBaseStructure.TIM_ClockDivision = TIM_CKD_DIV1;
     TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up ;
@@ -173,74 +103,139 @@ int main(void)
 
     while(1)
     {
-    	TIM_Cmd(TIM2, ENABLE);// wlaczenie timera
+    	TIM_Cmd(TIM2, ENABLE);// /*ENABLE TIMER2 */
+    	LIS302DL_Read(&acceleration_x, LIS302DL_OUT_X_ADDR, 1);
+        LIS302DL_Read(&acceleration_y, LIS302DL_OUT_Y_ADDR, 1);
+        LIS302DL_Read(&acceleration_z, LIS302DL_OUT_Z_ADDR, 1);
 
+        asixNormalization(&acceleration_x, &acceleration_y, &acceleration_z);
+        /*setting the value of the packet for the accelerometer*/
+        setAccelerometerPacketField(&accPacket, acceleration_x, acceleration_y, acceleration_z);
 
-    	LIS302DL_Read(&przyspieszenie_x, LIS302DL_OUT_X_ADDR, 1);
-    	/*if(przyspieszenie_x>127)
-    	{
-			przyspieszenie_x=przyspieszenie_x-1;
-			przyspieszenie_x=(~przyspieszenie_x)&0xFF;
-			przyspieszenie_x=-przyspieszenie_x;
-    	}*/
-
-        LIS302DL_Read(&przyspieszenie_y, LIS302DL_OUT_Y_ADDR, 1);
-        /*if(przyspieszenie_y>127)
-        {
-            przyspieszenie_y=przyspieszenie_y-1;
-            przyspieszenie_y=(~przyspieszenie_y)&0xFF;
-            przyspieszenie_y=-przyspieszenie_y;
-        }*/
-
-        LIS302DL_Read(&przyspieszenie_z, LIS302DL_OUT_Z_ADDR, 1);
-    	/*if(przyspieszenie_z>127)
-        {
-			przyspieszenie_z=przyspieszenie_z-1;
-			przyspieszenie_z=(~przyspieszenie_z)&0xFF;
-			przyspieszenie_z=-przyspieszenie_z;
-        }*/
-
-        asixNormalization(&przyspieszenie_x, &przyspieszenie_y, &przyspieszenie_z);
-   //    for(j=0;j<300000;j++){  //slowloop
-     //   }
-
-
-        /*ustawienie wartosci pakietu dla akcelerometru*/
-        accPacket.x=przyspieszenie_x;
-       // accPacket.y=((przyspieszenie_y+128)/128)*9.8;
-        accPacket.y=(przyspieszenie_y*9.8f)/128;
-       // accPacket.y=(przyspieszenie_y+4)/128*9.8;
-      //  accPacket.y=przyspieszenie_y+128;
-        accPacket.z=przyspieszenie_z;
-        accPacket.crc=CRC_START;
-        /*setAccelerometerPacketField(&accPacket, przyspieszenie_x, przyspieszenie_y, przyspieszenie_z);*/
-
-        /*wyslanie pakietu akcelerometru*/
+        /*sending accelerometer packet*/
         VCP_send_buffer(&accPacket, sizeof(accPacket_t));
 
-
-        /*ustawienie wartosci dla pakietu przycisku*/
-        if(GPIO_ReadInputDataBit(GPIOA, GPIO_Pin_0))
-        	buttonPacket.butt1_state=BUTTON_CLICKED;
-        else
-        	buttonPacket.butt1_state=BUTTON_NO_CLICKED;
-        buttonPacket.butt2_state=BUTTON_NO_CLICKED;
-        buttonPacket.butt3_state=BUTTON_NO_CLICKED;
-        buttonPacket.butt4_state=BUTTON_NO_CLICKED;
-        buttonPacket.crc=CRC_START;
-        /*setButtonPacketField(&buttonPacket)*/
-        /*wyslanie pakietu przycisku*/
+        /*setting the value of the packet for the button*/
+        setButtonPacketField(&buttonPacket);
+        /*sending button packet*/
         VCP_send_buffer(&buttonPacket, sizeof(buttonPacket_t));
-
 
         while(1)
         	if(TIM_GetFlagStatus(TIM2, TIM_FLAG_Update)) {
         		TIM_ClearFlag(TIM2, TIM_FLAG_Update);
         		break;
         	}
-
-
-
+        GPIO_SetBits(GPIOD, GPIO_Pin_12 | GPIO_Pin_13 | GPIO_Pin_14 | GPIO_Pin_15);
     }
 }
 
+void enableClocks()
+{
+	 /* Enable GPIOA clock */
+	 RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA, ENABLE);
+
+	 /* Enable the SPI periph */
+	 RCC_APB2PeriphClockCmd(LIS302DL_SPI_CLK, ENABLE);
+
+	 /* Enable SCK, MOSI and MISO GPIO clocks */
+	 RCC_AHB1PeriphClockCmd(LIS302DL_SPI_SCK_GPIO_CLK | LIS302DL_SPI_MISO_GPIO_CLK | LIS302DL_SPI_MOSI_GPIO_CLK, ENABLE);
+
+	 /* Enable CS  GPIO clock */
+	 RCC_AHB1PeriphClockCmd(LIS302DL_SPI_CS_GPIO_CLK, ENABLE);
+
+	 /* Enable INT1 GPIO clock */
+	 RCC_AHB1PeriphClockCmd(LIS302DL_SPI_INT1_GPIO_CLK, ENABLE);
+
+	 /* Enable INT2 GPIO clock */
+	 RCC_AHB1PeriphClockCmd(LIS302DL_SPI_INT2_GPIO_CLK, ENABLE);
+
+	 /* Enable TIM2 clock */
+	 RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM2, ENABLE);
+
+	 /* Enable GPIOD clock */
+	 RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOD, ENABLE);
+}
+
+void gpio_PinAFConfig()
+{
+	 GPIO_PinAFConfig(LIS302DL_SPI_SCK_GPIO_PORT, LIS302DL_SPI_SCK_SOURCE, LIS302DL_SPI_SCK_AF);
+	 GPIO_PinAFConfig(LIS302DL_SPI_MISO_GPIO_PORT, LIS302DL_SPI_MISO_SOURCE, LIS302DL_SPI_MISO_AF);
+	 GPIO_PinAFConfig(LIS302DL_SPI_MOSI_GPIO_PORT, LIS302DL_SPI_MOSI_SOURCE, LIS302DL_SPI_MOSI_AF);
+}
+
+void initButton(GPIO_InitTypeDef* GPIO_InitStructure)
+{
+	GPIO_InitStructure->GPIO_Pin = GPIO_Pin_0;
+	GPIO_InitStructure->GPIO_Mode = GPIO_Mode_IN;
+}
+
+void initLeds(GPIO_InitTypeDef* GPIO_InitStructure)
+{
+	GPIO_InitStructure->GPIO_Pin = GPIO_Pin_12 | GPIO_Pin_13| GPIO_Pin_14| GPIO_Pin_15;
+	GPIO_InitStructure->GPIO_Mode = GPIO_Mode_OUT;
+	GPIO_InitStructure->GPIO_OType = GPIO_OType_PP;
+	GPIO_InitStructure->GPIO_Speed = GPIO_Speed_100MHz;
+	GPIO_InitStructure->GPIO_PuPd = GPIO_PuPd_NOPULL;
+}
+void initTim2(TIM_TimeBaseInitTypeDef* TIM_TimeBaseStructure)
+{
+	 TIM_TimeBaseStructure->TIM_Period = 999; //1999
+	 TIM_TimeBaseStructure->TIM_Prescaler = 550 - 1;
+	 TIM_TimeBaseStructure->TIM_ClockDivision = TIM_CKD_DIV1;
+	 TIM_TimeBaseStructure->TIM_CounterMode = TIM_CounterMode_Up ;
+}
+
+void initLIS302DL(LIS302DL_InitTypeDef*  LIS302DL_InitStruct, LIS302DL_InterruptConfigTypeDef* LIS302DL_InterruptStruct)
+{
+	/* Set configuration of LIS302DL*/
+	LIS302DL_InitStruct->Power_Mode = LIS302DL_LOWPOWERMODE_ACTIVE;
+	LIS302DL_InitStruct->Output_DataRate = LIS302DL_DATARATE_100;
+	LIS302DL_InitStruct->Axes_Enable = LIS302DL_X_ENABLE | LIS302DL_Y_ENABLE | LIS302DL_Z_ENABLE;
+	LIS302DL_InitStruct->Full_Scale = LIS302DL_FULLSCALE_2_3;
+	LIS302DL_InitStruct->Self_Test = LIS302DL_SELFTEST_NORMAL;
+	LIS302DL_Init(&LIS302DL_InitStruct);
+
+	/* Set configuration of Internal High Pass Filter of LIS302DL*/
+	LIS302DL_InterruptStruct->Latch_Request = LIS302DL_INTERRUPTREQUEST_LATCHED;
+	LIS302DL_InterruptStruct->SingleClick_Axes = LIS302DL_CLICKINTERRUPT_Z_ENABLE;
+	LIS302DL_InterruptStruct->DoubleClick_Axes = LIS302DL_DOUBLECLICKINTERRUPT_Z_ENABLE;
+	LIS302DL_InterruptConfig(&LIS302DL_InterruptStruct);
+}
+
+void initSPI(SPI_InitTypeDef*  SPI_InitStructure)
+{
+	/* SPI configuration -------------------------------------------------------*/
+	SPI_InitStructure->SPI_Direction = SPI_Direction_2Lines_FullDuplex;
+	SPI_InitStructure->SPI_DataSize = SPI_DataSize_8b;
+	SPI_InitStructure->SPI_CPOL = SPI_CPOL_Low;
+	SPI_InitStructure->SPI_CPHA = SPI_CPHA_1Edge;
+	SPI_InitStructure->SPI_NSS = SPI_NSS_Soft;
+	SPI_InitStructure->SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_4;
+	SPI_InitStructure->SPI_FirstBit = SPI_FirstBit_MSB;
+	SPI_InitStructure->SPI_CRCPolynomial = 7;
+	SPI_InitStructure->SPI_Mode = SPI_Mode_Master;
+}
+
+void configGPIOforListChip(GPIO_InitTypeDef* GPIO_InitStructure)
+{
+	/* Configure GPIO PIN for Lis Chip select */
+	GPIO_InitStructure->GPIO_Pin = LIS302DL_SPI_CS_PIN;
+	GPIO_InitStructure->GPIO_Mode = GPIO_Mode_OUT;
+	GPIO_InitStructure->GPIO_OType = GPIO_OType_PP;
+	GPIO_InitStructure->GPIO_Speed = GPIO_Speed_50MHz;
+	//GPIO_Init(LIS302DL_SPI_CS_GPIO_PORT, &GPIO_InitStructure);
+
+	/* Deselect : Chip Select high */
+	GPIO_SetBits(LIS302DL_SPI_CS_GPIO_PORT, LIS302DL_SPI_CS_PIN);
+
+	/* Configure GPIO PINs to detect Interrupts */
+	GPIO_InitStructure->GPIO_Pin = LIS302DL_SPI_INT1_PIN;
+	GPIO_InitStructure->GPIO_Mode = GPIO_Mode_IN;
+	GPIO_InitStructure->GPIO_OType = GPIO_OType_PP;
+	GPIO_InitStructure->GPIO_Speed = GPIO_Speed_50MHz;
+	GPIO_InitStructure->GPIO_PuPd  = GPIO_PuPd_NOPULL;
+	GPIO_Init(LIS302DL_SPI_INT1_GPIO_PORT, &GPIO_InitStructure);
+
+	GPIO_InitStructure->GPIO_Pin = LIS302DL_SPI_INT2_PIN;
+	GPIO_Init(LIS302DL_SPI_INT2_GPIO_PORT, &GPIO_InitStructure);
+}
