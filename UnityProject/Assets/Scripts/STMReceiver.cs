@@ -16,17 +16,20 @@ public class STMReceiver : IDisposable
     private const int DefaultDataBits = 8;
     private const string StopBitsKey = "stopBits";
     private const StopBits DefaultStopBits = StopBits.One;
+    private readonly byte[] _readFloatBuffer = new byte[4];
     private CarController _controller;
     private bool _keepListenieng = true;
     public ButtonsState Buttons;
     public float HorizontalAxis;
     public SerialPort Port;
     private Thread t;
-    private byte val;
+    private bool _blinkLeds = true;
 
     public STMReceiver()
     {
         Port = CreatePort();
+        LevelManager.RaceStarted += OnRaceStarted;
+        LevelManager.RaceFinished += OnRaceFinished;
 
         try
         {
@@ -43,6 +46,8 @@ public class STMReceiver : IDisposable
     public void Dispose()
     {
         _keepListenieng = false;
+        LevelManager.RaceFinished -= OnRaceFinished;
+        LevelManager.RaceStarted -= OnRaceStarted;
     }
 
     public void StartListening()
@@ -55,6 +60,16 @@ public class STMReceiver : IDisposable
         t = new Thread(InternalStartListening);
         _keepListenieng = true;
         t.Start();
+    }
+
+    private void OnRaceStarted()
+    {
+        _blinkLeds = false;
+    }
+
+    private void OnRaceFinished()
+    {
+        _blinkLeds = true;
     }
 
     private void InternalStartListening()
@@ -101,7 +116,6 @@ public class STMReceiver : IDisposable
         }
     }
 
-    private readonly byte[] _readFloatBuffer = new byte[4];
     private float ReadFloat()
     {
         _readFloatBuffer[0] = (byte) Port.ReadByte();
