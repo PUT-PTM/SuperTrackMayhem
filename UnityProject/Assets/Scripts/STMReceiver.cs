@@ -22,8 +22,10 @@ public class STMReceiver : IDisposable
     public ButtonsState Buttons;
     public float HorizontalAxis;
     public SerialPort Port;
+    public byte[] ledPacketToSend = new byte[3];
     private Thread t;
     private bool _blinkLeds = true;
+    private int [] _packetToSend = {100,20};
 
     public STMReceiver()
     {
@@ -70,14 +72,38 @@ public class STMReceiver : IDisposable
     private void OnRaceFinished()
     {
         _blinkLeds = true;
+        _packetToSend[0] += 100;
     }
 
     private void InternalStartListening()
     {
         while (_keepListenieng)
-        {
+        {            
+            if (_packetToSend[0] > 0)
+            {
+                if (_blinkLeds == true)
+                {
+                    ledPacketToSend[0] = 170;
+                    ledPacketToSend[1] = 238;
+                    ledPacketToSend[2] = 01;
+                    Debug.Log("Leds ON");
+                    Port.Write(ledPacketToSend, 0, 3);
+                    _packetToSend[0]--;
+                }
+            }
+            if (_packetToSend[1]>0)
+            {
+                if (_blinkLeds == false)
+                {
+                        ledPacketToSend[0] = 170;
+                        ledPacketToSend[1] = 238;
+                        ledPacketToSend[2] = 0;
+                        Debug.Log("Leds OFF");
+                        Port.Write(ledPacketToSend, 0, 3);
+                        _packetToSend[1]--;
+               }
+            }
             Port.BaseStream.Flush();
-
             // Wait for packet start byte
             if (Port.ReadByte() != 0xAA)
             {

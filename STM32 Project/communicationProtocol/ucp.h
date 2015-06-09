@@ -14,6 +14,11 @@
 #define BUTTON_CLICKED 0xFF
 #define BUTTON_NO_CLICKED 0x00
 
+#define LED_SEQUENCE 0xEE
+#define LED_NO_LEDS 0x00
+#define LED_ACCORDING_TO_CLOCK 0x01
+#define LED_REVERSE_AS_CLOCK 0x02
+#define LED_ALL_LEDS 0x03
 typedef struct __attribute__((packed)) syncPacket
 {
 	uint8_t start_flag;
@@ -52,3 +57,4 @@ typedef struct __attribute__((packed)) ledSequencePacket
 void asixNormalization(int8_t* acceleration_x, int8_t* acceleration_y, int8_t* acceleration_z);
 void setAccelerometerPacketField(accPacket_t* accPacket, int8_t acceleration_x, int8_t acceleration_y, int8_t acceleration_z);
 void setButtonPacketField(buttonPacket_t* buttonPacket );
+void setLedSequence(ledSequencePacket_t* ledSequencePacket, int ledCounter);

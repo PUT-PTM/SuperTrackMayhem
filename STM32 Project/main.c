@@ -85,7 +85,7 @@ int main(void)
     accPacket.start_flag=NEW_PACKET;
     accPacket.command=ACC_COMMAND_TYPE;
 
-    /* button package initialization */
+    /* button packet initialization */
     buttonPacket_t buttonPacket;
 
     /* Leds Configuration */
@@ -99,34 +99,67 @@ int main(void)
     TIM_TimeBaseStructure.TIM_ClockDivision = TIM_CKD_DIV1;
     TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up ;
     TIM_TimeBaseInit(TIM2, &TIM_TimeBaseStructure);
+    //GPIO_SetBits(GPIOD, GPIO_Pin_12 | GPIO_Pin_13 | GPIO_Pin_14 | GPIO_Pin_15);
 
+    /* buffer for incoming packet*/
+    uint8_t bufferForReading [3];
 
+    /* led counter to do led sequence */
+    int ledCounter=0;
+
+    /* led sequence packet initialization */
+    ledSequencePacket_t ledSeqPacket;
     while(1)
     {
-    	TIM_Cmd(TIM2, ENABLE);// /*ENABLE TIMER2 */
-    	LIS302DL_Read(&acceleration_x, LIS302DL_OUT_X_ADDR, 1);
-        LIS302DL_Read(&acceleration_y, LIS302DL_OUT_Y_ADDR, 1);
-        LIS302DL_Read(&acceleration_z, LIS302DL_OUT_Z_ADDR, 1);
+			TIM_Cmd(TIM2, ENABLE);// /*ENABLE TIMER2 */
+			LIS302DL_Read(&acceleration_x, LIS302DL_OUT_X_ADDR, 1);
+			LIS302DL_Read(&acceleration_y, LIS302DL_OUT_Y_ADDR, 1);
+			LIS302DL_Read(&acceleration_z, LIS302DL_OUT_Z_ADDR, 1);
 
-        asixNormalization(&acceleration_x, &acceleration_y, &acceleration_z);
-        /*setting the value of the packet for the accelerometer*/
-        setAccelerometerPacketField(&accPacket, acceleration_x, acceleration_y, acceleration_z);
+			asixNormalization(&acceleration_x, &acceleration_y, &acceleration_z);
 
-        /*sending accelerometer packet*/
-        VCP_send_buffer(&accPacket, sizeof(accPacket_t));
+			/*setting the value of the packet for the accelerometer*/
+			setAccelerometerPacketField(&accPacket, acceleration_x, acceleration_y, acceleration_z);
+			/*sending accelerometer packet*/
+			VCP_send_buffer(&accPacket, sizeof(accPacket_t));
 
-        /*setting the value of the packet for the button*/
-        setButtonPacketField(&buttonPacket);
-        /*sending button packet*/
-        VCP_send_buffer(&buttonPacket, sizeof(buttonPacket_t));
+			/*setting the value of the packet for the button*/
+			setButtonPacketField(&buttonPacket);
+			/*sending button packet*/
+			VCP_send_buffer(&buttonPacket, sizeof(buttonPacket_t));
 
-        while(1)
-        	if(TIM_GetFlagStatus(TIM2, TIM_FLAG_Update)) {
-        		TIM_ClearFlag(TIM2, TIM_FLAG_Update);
-        		break;
-        	}
-        GPIO_SetBits(GPIOD, GPIO_Pin_12 | GPIO_Pin_13 | GPIO_Pin_14 | GPIO_Pin_15);
+			/* reading incoming packet*/
+			VCP_get_char(&bufferForReading[0]);
+
+			if(bufferForReading[0]==NEW_PACKET)
+			{
+				VCP_get_char(&bufferForReading[1]);
+				if(bufferForReading[1]==LED_SEQUENCE)
+				{
+					VCP_get_char(&bufferForReading[2]);
+					ledSeqPacket.start_flag=NEW_PACKET;
+					ledSeqPacket.command=LED_SEQUENCE;
+					ledSeqPacket.sequence_number=bufferForReading[2];
+					setLedSequence(&ledSeqPacket, ledCounter);
+				}
+			}
+
+			ledCounter++;
+			/*reset led counter*/
+			if (ledCounter==60)
+				ledCounter=0;
+			/* end of reading and handling incoming packet */
+
+			while(1)
+				if(TIM_GetFlagStatus(TIM2, TIM_FLAG_Update)) {
+					TIM_ClearFlag(TIM2, TIM_FLAG_Update);
+					break;
+				}
+
+
     }
+
+
 }
 
 void enableClocks()
