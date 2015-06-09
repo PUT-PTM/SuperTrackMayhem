@@ -13,14 +13,19 @@ public class CarController : MonoBehaviour
 		_engine = GetComponent<Engine>();
 		_steering = GetComponent<Steering>();
 		LevelManager.RaceStarted += EnableControls;
-		LevelManager.RaceFinished += DisableControls;
+		LevelManager.RaceFinished += OnRaceFinished;
 	}
 
 	private void OnDestroy()
 	{
 		LevelManager.RaceStarted -= EnableControls;
-		LevelManager.RaceFinished -= DisableControls;
+		LevelManager.RaceFinished -= OnRaceFinished;
 	}
+
+    private void OnRaceFinished(bool success)
+    {
+        DisableControls();
+    }
 
 	private void EnableControls()
 	{

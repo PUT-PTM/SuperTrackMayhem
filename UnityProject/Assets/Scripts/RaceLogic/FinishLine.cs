@@ -1,14 +1,14 @@
 ﻿using UnityEngine;
 
-public class FinishLine : MonoBehaviour 
+public class FinishLine : MonoBehaviour
 {
-	void OnTriggerEnter(Collider other)
-	{
-		if (!other.CompareTag(Constants.PlayerCarTag))
-		{
-			return;
-		}
+    private void OnTriggerEnter(Collider other)
+    {
+        if (!other.CompareTag(Constants.PlayerCarTag))
+        {
+            return;
+        }
 
-		LevelManager.OnFinishRace();
-	}
+        LevelManager.FinishRace(true);
+    }
 }

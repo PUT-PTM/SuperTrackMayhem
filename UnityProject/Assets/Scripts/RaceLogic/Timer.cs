@@ -79,7 +79,7 @@ public class Timer : MonoBehaviour
 		_timeLastCheckpoint = Time.time;
 	}
 
-	private void OnRaceFinished()
+	private void OnRaceFinished(bool success)
 	{
 		_inRace = false;
 

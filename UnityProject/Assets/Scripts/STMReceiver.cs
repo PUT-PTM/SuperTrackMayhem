@@ -69,7 +69,7 @@ public class STMReceiver : IDisposable
         _blinkLeds = false;
     }
 
-    private void OnRaceFinished()
+    private void OnRaceFinished(bool success)
     {
         _blinkLeds = true;
         _packetToSend[0] += 100;
