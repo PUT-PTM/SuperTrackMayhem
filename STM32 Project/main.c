@@ -102,7 +102,7 @@ int main(void)
     //GPIO_SetBits(GPIOD, GPIO_Pin_12 | GPIO_Pin_13 | GPIO_Pin_14 | GPIO_Pin_15);
 
     /* buffer for incoming packet*/
-    uint8_t bufferForReading [3];
+    uint8_t bufferForReading [4];
 
     /* led counter to do led sequence */
     int ledCounter=0;
@@ -137,9 +137,11 @@ int main(void)
 				if(bufferForReading[1]==LED_SEQUENCE)
 				{
 					VCP_get_char(&bufferForReading[2]);
+					VCP_get_char(&bufferForReading[3]);
 					ledSeqPacket.start_flag=NEW_PACKET;
 					ledSeqPacket.command=LED_SEQUENCE;
 					ledSeqPacket.sequence_number=bufferForReading[2];
+					ledSeqPacket.crc=bufferForReading[3];
 					setLedSequence(&ledSeqPacket, ledCounter);
 				}
 			}

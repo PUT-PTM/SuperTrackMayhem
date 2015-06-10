@@ -52,6 +52,7 @@ typedef struct __attribute__((packed)) ledSequencePacket
 	uint8_t start_flag;
 	uint8_t command;
 	uint8_t sequence_number;
+	uint8_t crc;
 }ledSequencePacket_t;
 
 void asixNormalization(int8_t* acceleration_x, int8_t* acceleration_y, int8_t* acceleration_z);

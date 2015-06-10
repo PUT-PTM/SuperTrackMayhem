@@ -24,9 +24,9 @@ public class STMReceiver : IDisposable
     public ButtonsState Buttons;
     public float HorizontalAxis;
     public SerialPort Port;
-    public byte[] ledPacketToSend = new byte[3];
+    public byte[] ledPacketToSend = new byte[4];
     private Thread t;
-    private int [] _packetToSend = {100,20};
+    private int[] _numberOfLedPackets = { 100, 20 };
 
     public STMReceiver()
     {
@@ -86,35 +86,37 @@ public class STMReceiver : IDisposable
     private void OnRaceFinished(bool success)
     {
         _blinkLeds = true;
-        _packetToSend[0] += 100;
+        _numberOfLedPackets[0] += 100;
     }
 
     private void InternalStartListening()
     {
         while (_keepListenieng)
-        {            
-            if (_packetToSend[0] > 0)
+        {
+            if (_numberOfLedPackets[0] > 0)
             {
                 if (_blinkLeds == true)
                 {
-                    ledPacketToSend[0] = 170;
-                    ledPacketToSend[1] = 238;
-                    ledPacketToSend[2] = 01;
+                    ledPacketToSend[0] = 170; // NEW_PACKET
+                    ledPacketToSend[1] = 238; // LED_SEQUENCE
+                    ledPacketToSend[2] = 01;  // LED_ACCORDING_TO_CLOCK
+                    ledPacketToSend[3] = 99;  // CRC_START
                     Debug.Log("Leds ON");
-                    Port.Write(ledPacketToSend, 0, 3);
-                    _packetToSend[0]--;
+                    Port.Write(ledPacketToSend, 0, 4);
+                    _numberOfLedPackets[0]--;
                 }
             }
-            if (_packetToSend[1]>0)
+            if (_numberOfLedPackets[1] > 0)
             {
                 if (_blinkLeds == false)
                 {
-                        ledPacketToSend[0] = 170;
-                        ledPacketToSend[1] = 238;
-                        ledPacketToSend[2] = 0;
-                        Debug.Log("Leds OFF");
-                        Port.Write(ledPacketToSend, 0, 3);
-                        _packetToSend[1]--;
+                   ledPacketToSend[0] = 170; // NEW_PACKET
+                   ledPacketToSend[1] = 238; // LED_SEQUENCE
+                   ledPacketToSend[2] = 0;   // LED_NO_LEDS
+                   ledPacketToSend[3] = 99;  // CRC_START
+                   Debug.Log("Leds OFF");
+                   Port.Write(ledPacketToSend, 0, 4);
+                   _numberOfLedPackets[1]--;
                }
             }
             Port.BaseStream.Flush();
@@ -129,7 +131,6 @@ public class STMReceiver : IDisposable
             if (command == 0xAC)
             {
                 Debug.Log("Accelerometer command nr: " + command + "\n");
-
                 var axisX = ReadFloat();
                 Debug.Log("X axis: " + axisX + "\n");
 
