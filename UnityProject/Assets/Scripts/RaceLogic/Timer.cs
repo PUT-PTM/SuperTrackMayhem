@@ -66,7 +66,6 @@ public class Timer : MonoBehaviour
 	private void OnCheckpointReached(int checkpoint)
 	{
 		var timeSinceLastCheckpoint = Time.time - _timeLastCheckpoint;
-		Debug.Log(timeSinceLastCheckpoint);
 		if (timeSinceLastCheckpoint < _bestTimes[checkpoint])
 		{
 			_bestTimes[checkpoint] = timeSinceLastCheckpoint;

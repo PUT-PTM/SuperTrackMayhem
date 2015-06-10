@@ -16,7 +16,9 @@ public class STMReceiver : IDisposable
     private const int DefaultDataBits = 8;
     private const string StopBitsKey = "stopBits";
     private const StopBits DefaultStopBits = StopBits.One;
+    private static STMReceiver _instance;
     private readonly byte[] _readFloatBuffer = new byte[4];
+    private bool _blinkLeds = true;
     private CarController _controller;
     private bool _keepListenieng = true;
     public ButtonsState Buttons;
@@ -24,7 +26,6 @@ public class STMReceiver : IDisposable
     public SerialPort Port;
     public byte[] ledPacketToSend = new byte[3];
     private Thread t;
-    private bool _blinkLeds = true;
     private int [] _packetToSend = {100,20};
 
     public STMReceiver()
@@ -42,6 +43,19 @@ public class STMReceiver : IDisposable
         catch
         {
             Debug.Log("Error, cannot open port");
+        }
+    }
+
+    public static STMReceiver Instance
+    {
+        get
+        {
+            if (_instance == null)
+            {
+                _instance = new STMReceiver();
+                _instance.StartListening();
+            }
+            return _instance;
         }
     }
 
