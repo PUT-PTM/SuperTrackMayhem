@@ -21,9 +21,9 @@ void setButtonPacketField(buttonPacket_t* buttonPacket)
 
 void setAccelerometerPacketField(accPacket_t* accPacket, int8_t acceleration_x, int8_t acceleration_y, int8_t acceleration_z)
 {
-	accPacket->x=acceleration_x;
+	accPacket->x=(acceleration_x*9.8f)/128;
 	accPacket->y=(acceleration_y*9.8f)/128;
-	accPacket->z=acceleration_z;
+	accPacket->z=(acceleration_z*9.8f)/128;
 	accPacket->crc=CRC_START;
 }
 
