@@ -7,7 +7,7 @@ using UnityEngine;
 public class STMReceiver : IDisposable
 {
     private const string PortNameKey = "portName";
-    private const string DefaultPortName = "COM5";
+    private const string DefaultPortName = "COM4";
     private const string BaudRateKey = "baudRate";
     private const int DefaultBaudRate = 112500;
     private const string ParityKey = "parity";
@@ -42,6 +42,7 @@ public class STMReceiver : IDisposable
 
         catch
         {
+            Debug.Log(Port.PortName);
             Debug.Log("Error, cannot open port");
         }
     }

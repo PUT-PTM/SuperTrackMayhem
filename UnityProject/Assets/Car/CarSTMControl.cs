@@ -14,4 +14,9 @@ public class CarSTMControl : MonoBehaviour
 		_controller.SetSteer(STMReceiver.Instance.HorizontalAxis/9.8f);
 		_controller.SetMoveDirection(!STMReceiver.Instance.Buttons.BreakButtonDown);
 	}
+
+    void OnDestroy()
+    {
+        STMReceiver.Instance.Dispose();
+    }
 }
