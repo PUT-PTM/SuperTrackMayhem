@@ -17,16 +17,16 @@ public class STMReceiver : IDisposable
     private const string StopBitsKey = "stopBits";
     private const StopBits DefaultStopBits = StopBits.One;
     private static STMReceiver _instance;
+    private readonly int[] _numberOfLedPackets = {100, 20};
     private readonly byte[] _readFloatBuffer = new byte[4];
     private bool _blinkLeds = true;
     private CarController _controller;
     private bool _keepListenieng = true;
     public ButtonsState Buttons;
     public float HorizontalAxis;
-    public SerialPort Port;
     public byte[] ledPacketToSend = new byte[4];
+    public SerialPort Port;
     private Thread t;
-    private int[] _numberOfLedPackets = { 100, 20 };
 
     public STMReceiver()
     {
@@ -37,13 +37,9 @@ public class STMReceiver : IDisposable
         try
         {
             Port.Open();
-            Debug.Log("Port open OK");
         }
-
         catch
         {
-            Debug.Log(Port.PortName);
-            Debug.Log("Error, cannot open port");
         }
     }
 
@@ -71,7 +67,7 @@ public class STMReceiver : IDisposable
     {
         if (!Port.IsOpen)
         {
-            Debug.Log("Port is not open, cannot start listening");
+            Debug.LogWarning("Port is not open, cannot start listening");
             return;
         }
         t = new Thread(InternalStartListening);
@@ -96,13 +92,12 @@ public class STMReceiver : IDisposable
         {
             if (_numberOfLedPackets[0] > 0)
             {
-                if (_blinkLeds == true)
+                if (_blinkLeds)
                 {
                     ledPacketToSend[0] = 170; // NEW_PACKET
                     ledPacketToSend[1] = 238; // LED_SEQUENCE
-                    ledPacketToSend[2] = 01;  // LED_ACCORDING_TO_CLOCK
-                    ledPacketToSend[3] = 99;  // CRC_START
-                    Debug.Log("Leds ON");
+                    ledPacketToSend[2] = 01; // LED_ACCORDING_TO_CLOCK
+                    ledPacketToSend[3] = 99; // CRC_START
                     Port.Write(ledPacketToSend, 0, 4);
                     _numberOfLedPackets[0]--;
                 }
@@ -111,14 +106,13 @@ public class STMReceiver : IDisposable
             {
                 if (_blinkLeds == false)
                 {
-                   ledPacketToSend[0] = 170; // NEW_PACKET
-                   ledPacketToSend[1] = 238; // LED_SEQUENCE
-                   ledPacketToSend[2] = 0;   // LED_NO_LEDS
-                   ledPacketToSend[3] = 99;  // CRC_START
-                   Debug.Log("Leds OFF");
-                   Port.Write(ledPacketToSend, 0, 4);
-                   _numberOfLedPackets[1]--;
-               }
+                    ledPacketToSend[0] = 170; // NEW_PACKET
+                    ledPacketToSend[1] = 238; // LED_SEQUENCE
+                    ledPacketToSend[2] = 0; // LED_NO_LEDS
+                    ledPacketToSend[3] = 99; // CRC_START
+                    Port.Write(ledPacketToSend, 0, 4);
+                    _numberOfLedPackets[1]--;
+                }
             }
             Port.BaseStream.Flush();
             // Wait for packet start byte
@@ -131,29 +125,29 @@ public class STMReceiver : IDisposable
 
             if (command == 0xAC)
             {
-                Debug.Log("Accelerometer command nr: " + command + "\n");
                 var axisX = ReadFloat();
-                Debug.Log("X axis: " + axisX + "\n");
-
-                HorizontalAxis = ReadFloat();
-                Debug.Log("Y axis: " + HorizontalAxis + "\n");
-
+                var tempHorizontalAxis = ReadFloat();
                 var axisZ = ReadFloat();
-                Debug.Log("Z axis: " + axisZ + "\n");
-
                 var crc = (byte) Port.ReadByte();
-                Debug.Log("CRC: " + crc + "\n\n");
+                if (crc == 99)
+                {
+                    HorizontalAxis = tempHorizontalAxis;
+                }
             }
             else if (command == 0x38)
             {
-                Debug.Log("Button command nr: " + command + "\n");
-                Buttons.BreakButtonDown = Port.ReadByte() != 0;
-                Debug.Log("Button 1 state: " + Buttons.BreakButtonDown + "\n");
-
-                Buttons.Button1Down = Port.ReadByte() != 0;
-                Buttons.Button2Down = Port.ReadByte() != 0;
-                Buttons.Button3Down = Port.ReadByte() != 0;
+                var tempButtons = new ButtonsState
+                {
+                    BreakButtonDown = Port.ReadByte() != 0,
+                    Button1Down = Port.ReadByte() != 0,
+                    Button2Down = Port.ReadByte() != 0,
+                    Button3Down = Port.ReadByte() != 0
+                };
                 var crc = (byte) Port.ReadByte();
+                if (crc == 99)
+                {
+                    Buttons = tempButtons;
+                }
             }
         }
     }
