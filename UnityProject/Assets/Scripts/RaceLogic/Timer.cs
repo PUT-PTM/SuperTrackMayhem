@@ -89,10 +89,8 @@ public class Timer : MonoBehaviour
 			PlayerPrefs.SetFloat(BestTimeKey, lapTime);
 		}
 
-		Debug.Log("Writing best times");
 		for (var i = 0; i < Constants.CheckpointCount; i++)
 		{
-			Debug.Log(_bestTimes[i]);
 			PlayerPrefs.SetFloat(CheckpointTimePrefix + i, _bestTimes[i]);
 		}
 	}

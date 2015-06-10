@@ -5,7 +5,7 @@ using UnityStandardAssets.Vehicles.Car;
 public class StartingSequence : MonoBehaviour
 {
     private ControlScheme _selectedControl;
-    public Transform Camera;
+    public CameraTourController CamTour;
     public Transform Car;
     public Transform CarSpawnPoint;
     public float FadeOutAnimationTime;
@@ -46,6 +46,7 @@ public class StartingSequence : MonoBehaviour
     private IEnumerator FadeOutTitleCoroutine()
     {
         FadeOutTitleAnimator.SetTrigger("Start");
+        CamTour.EndTour();
         yield return new WaitForSeconds(FadeOutAnimationTime);
         foreach (var element in StartSequenceElements)
         {
