@@ -50,6 +50,7 @@ public class CarController : MonoBehaviour
 	{
 		if (!_controlsEnabled)
 		{
+            _engine.SetGas(0);
 			return;
 		}
 		// We move forward as default

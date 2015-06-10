@@ -82,6 +82,11 @@ public class Timer : MonoBehaviour
 	{
 		_inRace = false;
 
+	    if (!success)
+	    {
+	        return;
+	    }
+
 		var lapTime = Time.time - _timeStart;
 
 		if (lapTime < _bestLapTime)

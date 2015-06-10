@@ -16,11 +16,14 @@ public class StartingSequence : MonoBehaviour
     private void OnEnable()
     {
         Car.position = CarSpawnPoint.position;
+        Car.rotation = CarSpawnPoint.rotation;
         foreach (var startSequenceElement in StartSequenceElements)
         {
             startSequenceElement.SetActive(true);
         }
         StartCoroutine(SelectControlsCoroutine());
+        CamTour.StartTour();
+        Car.gameObject.GetComponent<Rigidbody>().velocity = Vector3.zero;
     }
 
     private IEnumerator SelectControlsCoroutine()

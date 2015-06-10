@@ -12,6 +12,7 @@ public class Engine : MonoBehaviour
     public WheelCollider[] FrontWheels;
 	public WheelCollider[] RearWheels;
 	public float BreakingThreshold = -0.1f;
+    private bool _forceBreak;
 
 	private void Awake()
 	{
@@ -22,12 +23,13 @@ public class Engine : MonoBehaviour
 	public void SetGas(float gas)
 	{
 		_gas = gas;
+	    _forceBreak = gas == 0;
 	}
 
 	private void FixedUpdate()
 	{
 		var dot = Vector3.Dot(_transform.forward*_gas, _rigidbody.velocity);
-		var breaking = dot < BreakingThreshold;
+		var breaking = dot < BreakingThreshold || _forceBreak;
 
 	    int wheelCount = UseFourWheels ? 4 : 2;
 
@@ -66,9 +68,6 @@ public class Engine : MonoBehaviour
 		    {
 		        wheelCollider.brakeTorque = BreakingForce/wheelCount;
 		        wheelCollider.brakeTorque = 0;
-		    }
-		    {
-		            
 		    }
 		}
 	}
