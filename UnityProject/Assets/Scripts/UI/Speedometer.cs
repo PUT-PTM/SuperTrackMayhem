@@ -14,8 +14,9 @@ public class Speedometer : MonoBehaviour
     private void Update()
     {
         var speed = Vector3.Dot(_car.velocity, _car.transform.forward)*3.6f;
+
         // The speed is in m/s even though the speedometer says mph. 
         // This is intentional since our car runs at unrealistic speeds.
-        Hand.localRotation = Quaternion.AngleAxis(speed/120*Rotation120, Vector3.forward);
+        Hand.localRotation = Quaternion.AngleAxis(Mathf.Abs(speed/120)*Rotation120, Vector3.forward);
     }
 }
