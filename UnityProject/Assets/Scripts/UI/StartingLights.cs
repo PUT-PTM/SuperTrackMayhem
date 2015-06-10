@@ -6,7 +6,7 @@ public class StartingLights : MonoBehaviour
     public GameObject[] Lights;
     public float TimeBetweenLights;
 
-    private void Start()
+    private void OnEnable()
     {
         StartCoroutine(LightsSequence());
     }

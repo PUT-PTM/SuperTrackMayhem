@@ -21,6 +21,10 @@ public class StartingSequence : MonoBehaviour
         {
             startSequenceElement.SetActive(true);
         }
+        foreach (var elem in ToEnableAfterSequence)
+        {
+            elem.SetActive(false);
+        }
         StartCoroutine(SelectControlsCoroutine());
         CamTour.StartTour();
         Car.gameObject.GetComponent<Rigidbody>().velocity = Vector3.zero;
