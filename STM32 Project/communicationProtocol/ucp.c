@@ -51,7 +51,7 @@ void asixNormalization(int8_t* acceleration_x, int8_t* acceleration_y, int8_t* a
 
 void setLedSequence(ledSequencePacket_t* ledSequencePacket, int ledCounter)
 {
-	if(ledSeqPacket->crc==CRC_START)
+	if(ledSequencePacket->crc==CRC_START)
 	{
 		if (ledSequencePacket->sequence_number==LED_ACCORDING_TO_CLOCK)
 		{
