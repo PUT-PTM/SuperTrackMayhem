@@ -40,8 +40,11 @@ No future improvements are planned for the game. Feel free to create additional 
 The STM project is based upon 
 https://github.com/xenovacivus/STM32DiscoveryVCP
 
+[Orbitron font by Matt McInerney](https://www.google.com/fonts/specimen/Orbitron)
+
 ### License
-SuperTrackMayhem is released under the [MIT License](http://opensource.org/licenses/MIT). 
+SuperTrackMayhem is released under the [MIT License](http://opensource.org/licenses/MIT).
+Orbitron font is released under [SIL Open Font Licence](http://scripts.sil.org/cms/scripts/page.php?site_id=nrsi&id=OFL)
 
 ### Credits 
 Project made by *Jacek Przemieniecki* and *Bartosz Litwiniuk*.
