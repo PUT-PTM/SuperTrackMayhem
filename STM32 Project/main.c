@@ -88,6 +88,9 @@ int main(void)
     /* button packet initialization */
     buttonPacket_t buttonPacket;
 
+    /* led packet initialization */
+    ledPacket_t ledPacket;
+
     /* Leds Configuration */
     initLeds(&GPIO_InitStructure);
     GPIO_Init(GPIOD, &GPIO_InitStructure);
@@ -103,6 +106,9 @@ int main(void)
 
     /* buffer for incoming packet*/
     uint8_t bufferForReading [4];
+
+    /* buffer for led statet packet*/
+    uint8_t bufferForLeds [5];
 
     /* led counter to do led sequence */
     int ledCounter=0;
@@ -134,6 +140,7 @@ int main(void)
 			if(bufferForReading[0]==NEW_PACKET)
 			{
 				VCP_get_char(&bufferForReading[1]);
+
 				if(bufferForReading[1]==LED_SEQUENCE)
 				{
 					VCP_get_char(&bufferForReading[2]);
@@ -143,6 +150,19 @@ int main(void)
 					ledSeqPacket.sequence_number=bufferForReading[2];
 					ledSeqPacket.crc=bufferForReading[3];
 					setLedSequence(&ledSeqPacket, ledCounter);
+				}
+
+				if(bufferForReading[1]==LED_PACKET)
+				{
+					VCP_get_char(&bufferForReading[2]);
+					VCP_get_char(&bufferForReading[3]);
+					ledPacket.start_flag=NEW_PACKET;
+					ledPacket.led1_state=VCP_get_char(&bufferForLeds[0]);
+					ledPacket.led2_state=VCP_get_char(&bufferForLeds[1]);
+					ledPacket.led3_state=VCP_get_char(&bufferForLeds[2]);
+					ledPacket.led4_state=VCP_get_char(&bufferForLeds[3]);
+					ledPacket.crc=VCP_get_char(&bufferForLeds[4]);
+					setLedState(&ledPacket);
 				}
 			}
 

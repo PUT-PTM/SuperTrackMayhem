@@ -118,3 +118,31 @@ void setLedSequence(ledSequencePacket_t* ledSequencePacket, int ledCounter)
 			}
 	}
 }
+
+void setLedState(ledPacket_t* ledPacket)
+{
+	if(ledPacket->crc==CRC_START)
+	{
+		if(ledPacket->led1_state==LED_ON)
+			GPIO_SetBits(GPIOD, GPIO_Pin_12);
+		else
+			GPIO_ResetBits(GPIOD,GPIO_Pin_12);
+
+		if(ledPacket->led2_state==LED_ON)
+			GPIO_SetBits(GPIOD, GPIO_Pin_13);
+		else
+			GPIO_ResetBits(GPIOD,GPIO_Pin_13);
+
+		if(ledPacket->led3_state==LED_ON)
+			GPIO_SetBits(GPIOD, GPIO_Pin_14);
+		else
+			GPIO_ResetBits(GPIOD,GPIO_Pin_14);
+
+		if(ledPacket->led4_state==LED_ON)
+			GPIO_SetBits(GPIOD, GPIO_Pin_15);
+		else
+			GPIO_ResetBits(GPIOD,GPIO_Pin_15);
+
+	}
+}
+

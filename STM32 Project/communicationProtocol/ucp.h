@@ -19,6 +19,11 @@
 #define LED_ACCORDING_TO_CLOCK 0x01
 #define LED_REVERSE_AS_CLOCK 0x02
 #define LED_ALL_LEDS 0x03
+
+#define LED_PACKET 0xED
+#define LED_ON 0xFF
+#define LED_OFF 0x00
+
 typedef struct __attribute__((packed)) syncPacket
 {
 	uint8_t start_flag;
@@ -47,6 +52,18 @@ typedef struct __attribute__((packed)) buttonPacket
 	uint8_t crc;
 }buttonPacket_t;
 
+typedef struct __attribute__((packed)) ledPacket
+{
+	uint8_t start_flag;
+	uint8_t command;
+	uint8_t led1_state;
+	uint8_t led2_state;
+	uint8_t led3_state;
+	uint8_t led4_state;
+	uint8_t crc;
+}ledPacket_t;
+
+
 typedef struct __attribute__((packed)) ledSequencePacket
 {
 	uint8_t start_flag;
@@ -59,3 +76,4 @@ void asixNormalization(int8_t* acceleration_x, int8_t* acceleration_y, int8_t* a
 void setAccelerometerPacketField(accPacket_t* accPacket, int8_t acceleration_x, int8_t acceleration_y, int8_t acceleration_z);
 void setButtonPacketField(buttonPacket_t* buttonPacket );
 void setLedSequence(ledSequencePacket_t* ledSequencePacket, int ledCounter);
+void setLedState(ledPacket_t* ledPacket);
