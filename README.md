@@ -23,7 +23,7 @@ The game itself including the STM connector, and one sample level.
 
 
 ### How to run
-Builds will be available soon.
+Builds are available on our [release page](https://github.com/PUT-PTM/SuperTrackMayhem/releases)
 
 A virtual COM Port is used to establish connection between the board and the PC. The only virtual COM Port driver this project was tested with (under Window 8.1) is available under:
 http://www.st.com/web/en/catalog/tools/PF257938
